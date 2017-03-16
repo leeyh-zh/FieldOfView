@@ -9,7 +9,7 @@ import java.util.List;
 public class Daily {
 
     public String nextPageUrl;
-    public List<IssueList> issueLists;
+    public List<IssueList> issueList;
 
     public static class IssueList{
         public long releaseTime;
@@ -17,6 +17,6 @@ public class Daily {
         public long date;
         public long publishTime;
         public int count;
-        public List<ItemList> itemLists;
+        public List<ItemList> itemList;
     }
 }

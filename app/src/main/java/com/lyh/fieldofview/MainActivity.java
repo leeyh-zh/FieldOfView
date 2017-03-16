@@ -1,18 +1,34 @@
 package com.lyh.fieldofview;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
+import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.lyh.fieldofview.api.DailyApi;
 import com.lyh.fieldofview.base.ToolbarActivity;
+import com.lyh.fieldofview.model.Category;
+import com.lyh.fieldofview.model.Daily;
+import com.lyh.fieldofview.rx.ErrorAction;
+import com.lyh.fieldofview.rx.RxScroller;
 
 import me.drakeet.multitype.Items;
 import me.drakeet.multitype.MultiTypeAdapter;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends ToolbarActivity {
 
@@ -49,19 +65,78 @@ public class MainActivity extends ToolbarActivity {
 
         dailyApi = InteressantFactory.getRetrofit().createApi(DailyApi.class);
         setupRecyclerView();
+
+        RxSwipeRefreshLayout.refreshes(refreshLayout)
+                .compose(bindToLifecycle())
+                .subscribe(aVoid -> loadData(true));
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        loadData(true);
+    }
+
+    private void loadData(boolean clear) {
+        Observable<Daily> result;
+        if (clear) result = dailyApi.getDaily();
+        else result = dailyApi.getDaily(Long.decode(dateTime));
+
+        result.compose(bindToLifecycle())
+                .filter(daily -> daily != null)
+                .doOnNext(daily -> {
+                    if (clear) items.clear();
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doAfterTerminate(() -> refreshLayout.setRefreshing(false))
+                .subscribe(this::addData, ErrorAction.errorAction(this));
+    }
+
+    private void addData(Daily daily) {
+        for (Daily.IssueList issueList : daily.issueList) {
+            String date = issueList.itemList.get(0).data.text;
+            items.add(new Category(date == null ? "Today" : date));
+            items.addAll(issueList.itemList);
+        }
+        String nextPageUrl = daily.nextPageUrl;
+        Log.d("1111","nextPageUrl = " + nextPageUrl);
+        dateTime = nextPageUrl.substring(nextPageUrl.indexOf("=") + 1,
+                nextPageUrl.indexOf("&"));
+        Log.d("1111","dateTime = " + dateTime);
+        adapter.notifyDataSetChanged();
     }
 
     private void setupRecyclerView() {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         adapter = new MultiTypeAdapter(items);
+
+        Register.registerItem(adapter, this);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setOnTouchListener((v, event) -> refreshLayout.isRefreshing());
+
+        RxRecyclerView.scrollStateChanges(recyclerView)
+                .filter(integer -> !refreshLayout.isRefreshing())
+                .compose(bindToLifecycle())
+                .compose(RxScroller.scrollTransformer(layoutManager, adapter, items))
+                .subscribe(newState -> {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        loadData(false);
+                    }
+                });
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(menuItem -> {
-            menuItem.setChecked(true);
-            drawerLayout.closeDrawers();
-            findIntersting(menuItem);
-            return true;
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setChecked(true);
+                drawerLayout.closeDrawers();
+                findIntersting(item);
+                return true;
+            }
         });
     }
 
@@ -144,5 +219,31 @@ public class MainActivity extends ToolbarActivity {
             default:
                 return;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            drawerLayout.openDrawer(Gravity.START);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
