@@ -1,5 +1,6 @@
 package com.lyh.fieldofview;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,8 @@ import android.view.MenuItem;
 
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
+import com.lyh.fieldofview.activity.FindInterestingActivity;
+import com.lyh.fieldofview.activity.VideoAuthorActivity;
 import com.lyh.fieldofview.api.DailyApi;
 import com.lyh.fieldofview.base.ToolbarActivity;
 import com.lyh.fieldofview.model.Category;
@@ -100,10 +103,10 @@ public class MainActivity extends ToolbarActivity {
             items.addAll(issueList.itemList);
         }
         String nextPageUrl = daily.nextPageUrl;
-        Log.d("1111","nextPageUrl = " + nextPageUrl);
+        Log.d("1111", "nextPageUrl = " + nextPageUrl);
         dateTime = nextPageUrl.substring(nextPageUrl.indexOf("=") + 1,
                 nextPageUrl.indexOf("&"));
-        Log.d("1111","dateTime = " + dateTime);
+        Log.d("1111", "dateTime = " + dateTime);
         adapter.notifyDataSetChanged();
     }
 
@@ -216,9 +219,16 @@ public class MainActivity extends ToolbarActivity {
                 id = 20;
                 title = getResources().getString(R.string.music);
                 break;
+            case R.id.nav_author:
+                Intent intent = new Intent(this, VideoAuthorActivity.class);
+                startActivity(intent);
             default:
                 return;
         }
+        Intent intent = new Intent(this, FindInterestingActivity.class);
+        intent.putExtra(CATEGORY_ID, id);
+        intent.putExtra(TITLE, title);
+        startActivity(intent);
     }
 
     @Override

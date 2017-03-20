@@ -35,7 +35,7 @@
         android:stateListAnimator="@animator/image_pin"
         android:transitionName="@string/transition_shot"/>
 
-    <me.zsj.interessant.widget.FabToggle
+    <com.lyh.fieldofview.widget.FabToggle
         android:id="@+id/fab_play"
         android:layout_width="56dp"
         android:layout_height="56dp"

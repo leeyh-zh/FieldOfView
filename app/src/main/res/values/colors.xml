@@ -9,4 +9,6 @@
     <color name="line_color">#EFEFEF</color>
     <color name="tag_color">#33ffffff</color>
     <color name="ripple_light">#99ffffff</color>
+    <color name="divider">#1f000000</color> <!-- 12% black -->
+    <color name="media_controller_bg">#55000000</color>
 </resources>

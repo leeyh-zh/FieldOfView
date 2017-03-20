@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by lyh on 2017/3/15.
  */
 
-public class ItemList implements Parcelable{
+public class ItemList implements Parcelable {
 
     public String type;
     public Data data;

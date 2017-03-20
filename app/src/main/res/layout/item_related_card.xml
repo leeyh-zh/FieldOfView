@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:foreground="?selectableItemBackgroundBorderless">
 
-        <me.zsj.interessant.widget.RatioImageView
+        <com.lyh.fieldofview.widget.RatioImageView
             android:id="@+id/movie_album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
