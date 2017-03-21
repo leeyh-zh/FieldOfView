@@ -1,6 +1,7 @@
 package com.lyh.fieldofview.provider.related;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +12,16 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.lyh.fieldofview.R;
+import com.lyh.fieldofview.interesting.InterestingActivity;
+import com.lyh.fieldofview.activity.VideoListActivity;
 import com.lyh.fieldofview.model.Header;
+import com.lyh.fieldofview.utils.IDUtils;
 
 import java.util.concurrent.TimeUnit;
 
 import me.drakeet.multitype.ItemViewProvider;
+
+import static com.lyh.fieldofview.MainActivity.CATEGORY_ID;
 
 /**
  * @author zsj
@@ -47,17 +53,17 @@ public class RelatedHeaderViewProvider extends
     }
 
     private void toInteresting(Context context, int id, boolean related) {
-//        if (IDUtils.isDetermined(id) && !related) {
-//            Intent videoIntent = new Intent(context, VideoListActivity.class);
-//            videoIntent.putExtra("id", id);
-//            videoIntent.putExtra("newest", true);
-//            context.startActivity(videoIntent);
-//        } else {
-//            Intent interestingIntent = new Intent(context, InterestingActivity.class);
-//            interestingIntent.putExtra(CATEGORY_ID, id);
-//            interestingIntent.putExtra(InterestingActivity.RELATED_VIDEO, true);
-//            context.startActivity(interestingIntent);
-//        }
+        if (IDUtils.isDetermined(id) && !related) {
+            Intent videoIntent = new Intent(context, VideoListActivity.class);
+            videoIntent.putExtra("id", id);
+            videoIntent.putExtra("newest", true);
+            context.startActivity(videoIntent);
+        } else {
+            Intent interestingIntent = new Intent(context, InterestingActivity.class);
+            interestingIntent.putExtra(CATEGORY_ID, id);
+            interestingIntent.putExtra(InterestingActivity.RELATED_VIDEO, true);
+            context.startActivity(interestingIntent);
+        }
     }
 
     static class RelatedHeaderHolder extends RecyclerView.ViewHolder {

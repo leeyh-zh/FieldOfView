@@ -1,6 +1,7 @@
 package com.lyh.fieldofview.provider.related;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,11 +14,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding.view.RxView;
 import com.lyh.fieldofview.R;
+import com.lyh.fieldofview.interesting.InterestingActivity;
 import com.lyh.fieldofview.utils.CircleTransform;
 
 import java.util.concurrent.TimeUnit;
 
 import me.drakeet.multitype.ItemViewProvider;
+
+import static com.lyh.fieldofview.MainActivity.CATEGORY_ID;
+import static com.lyh.fieldofview.MainActivity.TITLE;
 
 
 /**
@@ -72,11 +77,11 @@ public class HeaderViewProvider extends
     }
 
     private void toInteresting(Context context, int id, String title) {
-//        Intent interestingIntent = new Intent(context, InterestingActivity.class);
-//        interestingIntent.putExtra(CATEGORY_ID, id);
-//        interestingIntent.putExtra(TITLE, title);
-//        interestingIntent.putExtra(InterestingActivity.RELATED_HEADER_VIDEO, true);
-//        context.startActivity(interestingIntent);
+        Intent interestingIntent = new Intent(context, InterestingActivity.class);
+        interestingIntent.putExtra(CATEGORY_ID, id);
+        interestingIntent.putExtra(TITLE, title);
+        interestingIntent.putExtra(InterestingActivity.RELATED_HEADER_VIDEO, true);
+        context.startActivity(interestingIntent);
     }
 
     static class HeaderHolder extends RecyclerView.ViewHolder {
